@@ -49,7 +49,8 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         ctx.cls();
         self.resources.insert(ctx.key);
-        self.systems.execute(&mut self.ecs, &mut self.resources)
+        self.systems.execute(&mut self.ecs, &mut self.resources);
+        render_draw_buffer(ctx).expect("Render error");
     }
 }
 fn main() -> BError {
