@@ -8,6 +8,7 @@ mod end_turn;
 mod hud;
 mod tooltips;
 mod movement;
+mod combat;
 
 pub fn build_input_scheduler() -> Schedule {
     Schedule::builder()
