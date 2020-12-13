@@ -24,6 +24,7 @@ pub struct WantsToAttack {
     pub victim : Entity,
 }
 
+// TODO use this for disorientation/blinding spells
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MovingRandomly;
 
@@ -35,3 +36,6 @@ pub struct Health {
 
 #[derive(Clone, PartialEq)]
 pub struct Name(pub String);
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ChasingPlayer;

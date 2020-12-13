@@ -13,8 +13,8 @@ pub fn spawn_player(ecs: &mut World, pos: Point) {
                 glyph: to_cp437('@')
             },
             Health{
-                current: 20,
-                max: 20,
+                current: 10,
+                max: 10,
             }
         )
     );
@@ -24,7 +24,7 @@ fn goblin() -> (i32, String, FontCharType) {
     (1, "Goblin".to_string(), to_cp437('g'))
 }
 fn orc() -> (i32, String, FontCharType) {
-    (2, "Orc".to_string(), to_cp437('o'))
+    (2, "Orc".to_string(), to_cp437('O'))
 }
 pub fn spawn_monster(
     ecs: &mut World,
@@ -35,6 +35,7 @@ pub fn spawn_monster(
         1..=8 => goblin(),
         _ => orc(),
     };
+    println!("Spawning {}", name);
     ecs.push(
         (
             Enemy,
@@ -46,7 +47,7 @@ pub fn spawn_monster(
                 ),
                 glyph
             },
-            MovingRandomly{},
+            ChasingPlayer{},
             Health{ current: hp, max: hp},
             Name(name),
         )
