@@ -15,8 +15,20 @@ pub fn map_render(
     for y in camera.top_y ..= camera.bottom_y {
         for x in camera.left_x ..= camera.right_x {
             let pt = Point::new(x, y);
+            let ptt = Point::new(x, y-1);
+            let ptb = Point::new(x, y+1);
+            let ptl = Point::new(x-1, y);
+            let ptr = Point::new(x+1, y);
             let offset = Point::new(camera.left_x, camera.top_y);
-            if map.in_bounds(pt) && player_fov.visible_tiles.contains(&pt) {
+            if map.in_bounds(pt)
+                && (player_fov.visible_tiles.contains(&pt)
+                    || (player_fov.visible_tiles.contains(&ptt)
+                            && player_fov.visible_tiles.contains(&ptb)
+                        )
+                    || (player_fov.visible_tiles.contains(&ptl)
+                            && player_fov.visible_tiles.contains(&ptr)
+                        )
+            ) {
                 let idx = map_idx(x, y);
                 let glyph = match map.tiles[idx] {
                     TileType::Floor => to_cp437('.'),
