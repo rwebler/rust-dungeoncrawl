@@ -11,6 +11,7 @@ mod movement;
 mod combat;
 mod chasing;
 mod fov;
+mod picking;
 
 pub fn build_input_scheduler() -> Schedule {
     Schedule::builder()
@@ -28,6 +29,8 @@ pub fn build_player_scheduler() -> Schedule {
         .add_system(combat::combat_system())
         .flush()
         .add_system(movement::movement_system())
+        .flush()
+        .add_system(picking::picking_system())
         .flush()
         .add_system(fov::fov_system())
         .flush()

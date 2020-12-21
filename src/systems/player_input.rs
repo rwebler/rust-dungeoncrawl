@@ -49,6 +49,7 @@ pub fn player_input(
                         **pos == destination
                     })
                     .for_each(|(entity, _)| {
+                        println!("{:?} wants to pick {:?}", player_entity, entity);
                         commands
                             .push(((), WantsToPick{
                                 picker: player_entity,
