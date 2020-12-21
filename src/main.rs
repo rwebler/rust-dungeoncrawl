@@ -41,6 +41,7 @@ impl State {
         let map_builder = MapBuilder::build(&mut rng);
         spawn_player(&mut ecs, map_builder.player_start);
         spawn_amulet_of_yala(&mut ecs, map_builder.amulet_start);
+        spawn_pike_of_destiny(&mut ecs, map_builder.pike_start);
         map_builder.rooms
             .iter()
             .skip(1)

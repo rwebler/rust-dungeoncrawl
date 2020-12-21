@@ -25,6 +25,12 @@ pub struct WantsToAttack {
     pub victim : Entity,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WantsToPick {
+    pub picker : Entity,
+    pub object : Entity,
+}
+
 // TODO use this for disorientation/blinding spells
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct MovingRandomly;
@@ -46,6 +52,9 @@ pub struct Item;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct AmuletOfYala;
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct PikeOfDestiny;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct FieldOfView{

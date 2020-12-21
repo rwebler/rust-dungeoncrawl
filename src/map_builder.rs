@@ -5,7 +5,8 @@ pub struct MapBuilder {
     pub map: Map,
     pub rooms: Vec<Rect>,
     pub player_start: Point,
-    pub amulet_start: Point
+    pub amulet_start: Point,
+    pub pike_start: Point
 }
 impl MapBuilder {
     fn fill(&mut self, tile: TileType) {
@@ -76,6 +77,7 @@ impl MapBuilder {
             rooms: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
+            pike_start: Point::zero(),
         };
         mb.fill(TileType::Wall);
         mb.build_random_rooms(rng);
@@ -89,6 +91,21 @@ impl MapBuilder {
             1024.0
         );
         mb.amulet_start = mb.map.index_to_point2d(
+            dijkstra_map.map
+                .iter()
+                .enumerate()
+                .filter(|(_, dist)| *dist < &std::f32::MAX)
+                .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
+                .unwrap().0
+        );
+        let dijkstra_map = DijkstraMap::new(
+            SCREEN_WIDTH,
+            SCREEN_HEIGHT,
+            &vec![mb.map.point2d_to_index(mb.amulet_start)],
+            &mb.map,
+            1024.0
+        );
+        mb.pike_start = mb.map.index_to_point2d(
             dijkstra_map.map
                 .iter()
                 .enumerate()

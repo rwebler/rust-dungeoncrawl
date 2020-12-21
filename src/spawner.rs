@@ -36,7 +36,7 @@ pub fn spawn_monster(
         1..=8 => goblin(),
         _ => orc(),
     };
-    println!("Spawning {}", name);
+    println!("Spawning {} @ {},{}", name, pos.x, pos.y);
     ecs.push(
         (
             Enemy,
@@ -57,6 +57,7 @@ pub fn spawn_monster(
 }
 
 pub fn spawn_amulet_of_yala(ecs: &mut World, pos: Point) {
+    println!("Spawning amulet @ {},{}", pos.x, pos.y);
     ecs.push(
         (
             Item,
@@ -67,6 +68,22 @@ pub fn spawn_amulet_of_yala(ecs: &mut World, pos: Point) {
                 glyph: to_cp437('|')
             },
             Name("Amulet of Yala".to_string())
+        )
+    );
+}
+
+pub fn spawn_pike_of_destiny(ecs: &mut World, pos: Point) {
+    println!("Spawning pike @ {},{}", pos.x, pos.y);
+    ecs.push(
+        (
+            Item,
+            PikeOfDestiny,
+            pos,
+            Render {
+                color: ColorPair::new(WHITE, BLACK),
+                glyph: to_cp437('\u{2191}')
+            },
+            Name("Pike of Destiny".to_string())
         )
     );
 }
