@@ -32,22 +32,21 @@ struct State {
     input_systems: Schedule,
     player_systems: Schedule,
     monster_systems: Schedule,
+    level: usize,
 }
 impl State {
     fn new() -> Self {
         let mut ecs = World::default();
         let mut resources = Resources::default();
         let mut rng = RandomNumberGenerator::new();
-        let map_builder = MapBuilder::build(&mut rng);
+        let level: usize = 0;
+        let map_builder = MapBuilder::build(&mut rng, level);
         spawn_player(&mut ecs, map_builder.player_start);
+        map_builder.monster_spawns
+            .iter()
+            .for_each(|pos| spawn_monster(&mut ecs, &mut rng, *pos));
         spawn_amulet_of_yala(&mut ecs, map_builder.amulet_start);
         spawn_pike_of_destiny(&mut ecs, map_builder.pike_start);
-        map_builder.rooms
-            .iter()
-            .skip(1)
-            .map(|r| r.center())
-            .for_each(|pos| spawn_monster(&mut ecs, &mut rng, pos))
-        ;
         resources.insert(map_builder.map);
         resources.insert(Camera::new(map_builder.player_start));
         resources.insert(TurnState::AwaitingInput);
@@ -56,7 +55,8 @@ impl State {
             resources,
             input_systems: build_input_scheduler(),
             player_systems: build_player_scheduler(),
-            monster_systems: build_monster_scheduler()
+            monster_systems: build_monster_scheduler(),
+            level: 0,
         }
     }
     fn game_over(&mut self, ctx: &mut BTerm) {
@@ -91,19 +91,19 @@ impl State {
     fn reset_game_state(&mut self) {
         self.ecs = World::default();
         self.resources = Resources::default();
+        self.level = 0;
         let mut rng = RandomNumberGenerator::new();
-        let map_builder = MapBuilder::build(&mut rng);
+        let map_builder = MapBuilder::build(&mut rng, self.level);
         spawn_player(&mut self.ecs, map_builder.player_start);
-        spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
-        map_builder.rooms
+        map_builder.monster_spawns
             .iter()
-            .skip(1)
-            .map(|r| r.center())
-            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, pos))
-        ;
+            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, *pos));
+        spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
+        spawn_pike_of_destiny(&mut self.ecs, map_builder.pike_start);
         self.resources.insert(map_builder.map);
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
+
     }
 }
 impl GameState for State {
