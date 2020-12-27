@@ -26,6 +26,8 @@ pub mod prelude {
 
 use prelude::*;
 
+const LEVEL: usize = 0;
+
 struct State {
     ecs: World,
     resources: Resources,
@@ -39,7 +41,7 @@ impl State {
         let mut ecs = World::default();
         let mut resources = Resources::default();
         let mut rng = RandomNumberGenerator::new();
-        let level: usize = 0;
+        let level: usize = LEVEL;
         let map_builder = MapBuilder::build(&mut rng, level);
         spawn_player(&mut ecs, map_builder.player_start);
         map_builder.monster_spawns
@@ -56,7 +58,7 @@ impl State {
             input_systems: build_input_scheduler(),
             player_systems: build_player_scheduler(),
             monster_systems: build_monster_scheduler(),
-            level: 0,
+            level: LEVEL,
         }
     }
     fn game_over(&mut self, ctx: &mut BTerm) {

@@ -1,13 +1,7 @@
 use crate::prelude::*;
 
-mod empty;
-use empty::EmptyArchitect;
-
-mod arena;
-use arena::ArenaArchitect;
-
-mod rooms;
-use rooms::RoomsArchitect;
+mod drunkard;
+use drunkard::DrunkardsWalkArchitect;
 
 const NUM_ROOMS: usize = 20;
 const MIDWAY: usize = NUM_ROOMS / 2;
@@ -107,13 +101,35 @@ impl MapBuilder {
             }
         }
     }
+    fn spawn_monsters(
+        &self,
+        start: &Point,
+        rng: &mut RandomNumberGenerator
+    ) -> Vec<Point> {
+        const NUM_MONSTERS: usize = 50;
+        let mut spawnable_tiles: Vec<Point> = self.map.tiles
+            .iter()
+            .enumerate()
+            .filter(|(idx, t)|
+                **t == TileType::Floor &&
+                DistanceAlg::Pythagoras.distance2d(
+                    *start,
+                    self.map.index_to_point2d(*idx)
+                ) > 10.0
+            )
+            .map(|(idx, _)| self.map.index_to_point2d(idx))
+            .collect();
+        let mut spawns = Vec::new();
+        for _ in 0..NUM_MONSTERS {
+            let target_index = rng.random_slice_index(&spawnable_tiles)
+                .unwrap();
+            spawns.push(spawnable_tiles[target_index].clone());
+            spawnable_tiles.remove(target_index);
+        }
+        spawns
+    }
     pub fn build(rng: &mut RandomNumberGenerator, level: usize) -> Self {
-        let mut architect = match level {
-            //0 => ForestArchitect{},
-            _ => RoomsArchitect{},
-            //2 => EmptyArchitect{},
-            //_ => CaveArchitect{},
-        };
+        let mut architect = DrunkardsWalkArchitect{};
         architect.build(rng)
     }
 }
