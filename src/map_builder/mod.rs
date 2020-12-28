@@ -3,8 +3,13 @@ use crate::prelude::*;
 mod drunkard;
 use drunkard::DrunkardsWalkArchitect;
 
+mod rooms;
+use rooms::RoomsArchitect;
+
+mod automata;
+use automata::CellularAutomataArchitect;
+
 const NUM_ROOMS: usize = 20;
-const MIDWAY: usize = NUM_ROOMS / 2;
 
 trait MapArchitect {
     fn build(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder;
@@ -129,7 +134,12 @@ impl MapBuilder {
         spawns
     }
     pub fn build(rng: &mut RandomNumberGenerator, level: usize) -> Self {
-        let mut architect = DrunkardsWalkArchitect{};
-        architect.build(rng)
+        let mut architect : Box<dyn MapArchitect> = match rng.range(0, 3) {
+            0 => Box::new(DrunkardsWalkArchitect{}),
+            1 => Box::new(RoomsArchitect{}),
+            _ => Box::new(CellularAutomataArchitect{})
+        };
+        let mb = architect.build(rng);
+        mb
     }
 }
