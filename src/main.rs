@@ -43,12 +43,19 @@ impl State {
         let mut rng = RandomNumberGenerator::new();
         let level: usize = LEVEL;
         let map_builder = MapBuilder::build(&mut rng, level);
-        spawn_player(&mut ecs, map_builder.player_start);
+        spawn_player(&mut ecs, map_builder.player_start, 1, 10);
         map_builder.monster_spawns
             .iter()
-            .for_each(|pos| spawn_monster(&mut ecs, &mut rng, *pos));
-        spawn_amulet_of_yala(&mut ecs, map_builder.amulet_start);
-        spawn_pike_of_destiny(&mut ecs, map_builder.pike_start);
+            .for_each(|pos| spawn_monster(&mut ecs, &mut rng, *pos, LEVEL));
+        if level == 3 {
+            spawn_amulet_of_yala(&mut ecs, map_builder.amulet_start);
+        }
+        if level == 2 {
+            spawn_pike_of_destiny(&mut ecs, map_builder.pike_start);
+        }
+        if level < 2 {
+            spawn_entrance(&mut ecs, map_builder.amulet_start);
+        }
         resources.insert(map_builder.map);
         resources.insert(Camera::new(map_builder.player_start));
         resources.insert(TurnState::AwaitingInput);
@@ -72,7 +79,7 @@ impl State {
         ctx.print_color_centered(9, GREEN, BLACK, "Press 1 to play again.");
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
-            self.reset_game_state();
+            self.reset_game_state(LEVEL, 1, 10);
         }
     }
     fn victory(&mut self, ctx: &mut BTerm) {
@@ -87,25 +94,41 @@ impl State {
         play again.");
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
-            self.reset_game_state();
+            self.reset_game_state(LEVEL, 1, 10);
         }
     }
-    fn reset_game_state(&mut self) {
+    fn descend(&mut self, level: usize) {
+        let mut player = <(&Health, &Player)>::query().filter(component::<Player>());
+        let mut damage = 1;
+        let mut current = 10;
+        player.iter(&self.ecs).for_each(|(hp, p1)| {
+            damage = p1.damage;
+            current = hp.current;
+        });
+        self.reset_game_state(level, damage, current);
+    }
+    fn reset_game_state(&mut self, level: usize, damage: i32, current: i32) {
         self.ecs = World::default();
         self.resources = Resources::default();
-        self.level = 0;
+        self.level = level;
         let mut rng = RandomNumberGenerator::new();
         let map_builder = MapBuilder::build(&mut rng, self.level);
-        spawn_player(&mut self.ecs, map_builder.player_start);
+        spawn_player(&mut self.ecs, map_builder.player_start, damage, current);
         map_builder.monster_spawns
             .iter()
-            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, *pos));
-        spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
-        spawn_pike_of_destiny(&mut self.ecs, map_builder.pike_start);
+            .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, *pos, self.level));
+        if self.level == 3 {
+            spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
+        }
+        if self.level == 2 {
+            spawn_pike_of_destiny(&mut self.ecs, map_builder.pike_start);
+        }
+        if self.level < 3 {
+            spawn_entrance(&mut self.ecs, map_builder.amulet_start);
+        }
         self.resources.insert(map_builder.map);
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
-
     }
 }
 impl GameState for State {
@@ -132,6 +155,7 @@ impl GameState for State {
             ),
             TurnState::GameOver => self.game_over(ctx),
             TurnState::Victory => self.victory(ctx),
+            TurnState::Descend => self.descend(self.level+1),
         }
         render_draw_buffer(ctx).expect("Render error");
     }

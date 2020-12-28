@@ -58,6 +58,9 @@ pub struct AmuletOfYala;
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct PikeOfDestiny;
 
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Entrance;
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct FieldOfView{
     pub visible_tiles : HashSet<Point>,

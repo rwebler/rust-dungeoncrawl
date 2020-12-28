@@ -35,7 +35,7 @@ impl DrunkardsWalkArchitect {
     }
 }
 impl MapArchitect for DrunkardsWalkArchitect {
-    fn build(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder {
+    fn build(&mut self, rng: &mut RandomNumberGenerator, level: usize) -> MapBuilder {
         let mut mb = MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),
@@ -70,7 +70,7 @@ impl MapArchitect for DrunkardsWalkArchitect {
                     .filter(|(_, distance)| *distance > &2000.0)
                     .for_each(|(idx, _)| mb.map.tiles[idx] = TileType::Wall);
             }
-        mb.monster_spawns = mb.spawn_monsters(&center, rng);
+        mb.monster_spawns = mb.spawn_monsters(&center, rng, level);
         mb.player_start = center;
         mb.amulet_start = mb.find_most_distant(center);
         mb.pike_start = mb.find_most_distant(mb.amulet_start);

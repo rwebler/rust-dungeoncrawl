@@ -65,7 +65,7 @@ impl CellularAutomataArchitect {
     }
 }
 impl MapArchitect for CellularAutomataArchitect {
-    fn build(&mut self, rng: &mut RandomNumberGenerator) -> MapBuilder {
+    fn build(&mut self, rng: &mut RandomNumberGenerator, level: usize) -> MapBuilder {
         let mut mb = MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),
@@ -79,7 +79,7 @@ impl MapArchitect for CellularAutomataArchitect {
             self.iteration(&mut mb.map);
         }
         let start = self.find_start(&mb.map);
-        mb.monster_spawns = mb.spawn_monsters(&start, rng);
+        mb.monster_spawns = mb.spawn_monsters(&start, rng, level);
         mb.player_start = start;
         mb.amulet_start = mb.find_most_distant(start);
         mb.pike_start = mb.find_most_distant(mb.amulet_start);
