@@ -120,7 +120,7 @@ impl State {
         if self.level == 3 {
             spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
         }
-        if self.level == 2 {
+        if self.level == 1 {
             spawn_pike_of_destiny(&mut self.ecs, map_builder.pike_start);
         }
         if self.level < 3 {
