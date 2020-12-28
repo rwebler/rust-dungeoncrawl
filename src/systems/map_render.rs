@@ -38,6 +38,8 @@ pub fn map_render(
                 let glyph = match map.tiles[idx] {
                     TileType::Floor => to_cp437('.'),
                     TileType::Wall => to_cp437('#'),
+                    TileType::Tree => to_cp437('"'),
+                    TileType::Ground => to_cp437(';'),
                 };
                 draw_batch.set(
                     pt - offset,

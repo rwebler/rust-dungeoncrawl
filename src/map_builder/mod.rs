@@ -116,7 +116,7 @@ impl MapBuilder {
             .iter()
             .enumerate()
             .filter(|(idx, t)|
-                **t == TileType::Floor &&
+                (**t == TileType::Floor || **t == TileType::Ground) &&
                 DistanceAlg::Pythagoras.distance2d(
                     *start,
                     self.map.index_to_point2d(*idx)
@@ -134,11 +134,14 @@ impl MapBuilder {
         spawns
     }
     pub fn build(rng: &mut RandomNumberGenerator, level: usize) -> Self {
-        let mut architect : Box<dyn MapArchitect> = match rng.range(0, 3) {
-            0 => Box::new(DrunkardsWalkArchitect{}),
-            1 => Box::new(RoomsArchitect{}),
-            _ => Box::new(CellularAutomataArchitect{})
-        };
+        let mut architect : Box<dyn MapArchitect> = Box::new(RoomsArchitect{});
+        if level < 3 {
+            architect = match rng.range(level, 2) {
+                0 => Box::new(CellularAutomataArchitect{}),
+                1 => Box::new(RoomsArchitect{}),
+                _ => Box::new(DrunkardsWalkArchitect{})
+            };
+        }
         let mb = architect.build(rng);
         mb
     }

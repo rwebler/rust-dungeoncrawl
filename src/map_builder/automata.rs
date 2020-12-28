@@ -11,9 +11,9 @@ impl CellularAutomataArchitect {
         map.tiles.iter_mut().for_each(|t| {
             let roll = rng.range(0, 100);
             if roll > 55 {
-                *t = TileType::Floor;
+                *t = TileType::Ground;
             } else {
-                *t = TileType::Wall;
+                *t = TileType::Tree;
             }
         });
     }
@@ -22,7 +22,7 @@ impl CellularAutomataArchitect {
         for iy in -1 ..= 1 {
             for ix in -1 ..= 1 {
                 if !(ix==0 && iy == 0) &&
-                    map.tiles[map_idx(x+ix, y+iy)] == TileType::Wall
+                    map.tiles[map_idx(x+ix, y+iy)] == TileType::Tree
                 {
                     neighbors += 1;
                 }
@@ -38,9 +38,9 @@ impl CellularAutomataArchitect {
                 let neighbors = self.count_neighbors(x, y, map);
                 let idx = map_idx(x, y);
                 if neighbors > 4 || neighbors == 0 {
-                    new_tiles[idx] = TileType::Wall;
+                    new_tiles[idx] = TileType::Tree;
                 } else {
-                    new_tiles[idx] = TileType::Floor;
+                    new_tiles[idx] = TileType::Ground;
                 }
             }
         }
@@ -51,7 +51,7 @@ impl CellularAutomataArchitect {
         let closest_point = map.tiles
             .iter()
             .enumerate()
-            .filter(|(_, t)| **t == TileType::Floor)
+            .filter(|(_, t)| **t == TileType::Ground)
             .map(|(idx, _)| (idx, DistanceAlg::Pythagoras.distance2d(
                 center,
                 map.index_to_point2d(idx)
