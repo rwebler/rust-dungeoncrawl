@@ -12,7 +12,7 @@ use automata::CellularAutomataArchitect;
 const NUM_ROOMS: usize = 20;
 
 trait MapArchitect {
-    fn build(&mut self, rng: &mut RandomNumberGenerator, level: usize) -> MapBuilder;
+    fn build(&mut self, rng: &mut RandomNumberGenerator, level: Level) -> MapBuilder;
 }
 
 pub struct MapBuilder {
@@ -110,7 +110,7 @@ impl MapBuilder {
         &self,
         start: &Point,
         rng: &mut RandomNumberGenerator,
-        level: usize
+        level: Level
     ) -> Vec<Point> {
         let mut spawnable_tiles: Vec<Point> = self.map.tiles
             .iter()
@@ -125,7 +125,7 @@ impl MapBuilder {
             .map(|(idx, _)| self.map.index_to_point2d(idx))
             .collect();
         let mut spawns = Vec::new();
-        for _ in 0..15 * (level+1) {
+        for _ in 0..15 * (level.level+1) {
             let target_index = rng.random_slice_index(&spawnable_tiles)
                 .unwrap();
             spawns.push(spawnable_tiles[target_index].clone());
@@ -133,10 +133,10 @@ impl MapBuilder {
         }
         spawns
     }
-    pub fn build(rng: &mut RandomNumberGenerator, level: usize) -> Self {
+    pub fn build(rng: &mut RandomNumberGenerator, level: Level) -> Self {
         let mut architect : Box<dyn MapArchitect> = Box::new(RoomsArchitect{});
-        if level < 3 {
-            architect = match level {
+        if level.level< 3 {
+            architect = match level.level {
                 0 => Box::new(CellularAutomataArchitect{}),
                 1 => Box::new(RoomsArchitect{}),
                 _ => Box::new(DrunkardsWalkArchitect{})

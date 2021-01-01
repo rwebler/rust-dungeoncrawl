@@ -65,7 +65,7 @@ impl CellularAutomataArchitect {
     }
 }
 impl MapArchitect for CellularAutomataArchitect {
-    fn build(&mut self, rng: &mut RandomNumberGenerator, level: usize) -> MapBuilder {
+    fn build(&mut self, rng: &mut RandomNumberGenerator, level: Level) -> MapBuilder {
         let mut mb = MapBuilder {
             map: Map::new(),
             rooms: Vec::new(),

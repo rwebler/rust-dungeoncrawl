@@ -33,9 +33,9 @@ pub fn spawn_monster(
     ecs: &mut World,
     rng: &mut RandomNumberGenerator,
     pos: Point,
-    level: usize
+    level: Level
 ) {
-    let (hp, name, glyph, radius) = match rng.roll_dice(1, 10) + (level as i32) {
+    let (hp, name, glyph, radius) = match rng.roll_dice(1, 10) + (level.level as i32) {
         1..=8 => goblin(),
         _ => orc(),
     };
