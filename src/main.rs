@@ -26,7 +26,7 @@ pub mod prelude {
     pub use crate::Kills;
 }
 
-const LEVEL: usize = 1;
+const LEVEL: usize = 0;
 
 use prelude::*;
 
