@@ -27,7 +27,13 @@ fn goblin() -> (i32, String, FontCharType, i32) {
     (1, "Goblin".to_string(), to_cp437('g'), 7)
 }
 fn orc() -> (i32, String, FontCharType, i32) {
-    (2, "Orc".to_string(), to_cp437('O'), 5)
+    (2, "Orc Spectre".to_string(), to_cp437('o'), 5)
+}
+fn orc_brute() -> (i32, String, FontCharType, i32) {
+    (3, "Orc".to_string(), to_cp437('O'), 4)
+}
+fn ettin() -> (i32, String, FontCharType, i32) {
+    (4, "Ettin".to_string(), to_cp437('E'), 3)
 }
 pub fn spawn_monster(
     ecs: &mut World,
@@ -35,9 +41,11 @@ pub fn spawn_monster(
     pos: Point,
     level: Level
 ) {
-    let (hp, name, glyph, radius) = match rng.roll_dice(1, 10) + (level.level as i32) {
-        1..=8 => goblin(),
-        _ => orc(),
+    let (hp, name, glyph, radius) = match rng.roll_dice(1, 12) + (level.level as i32) {
+        1..=7 => goblin(),
+        8..=11 => orc(),
+        12..=13 => orc_brute(),
+        _ => ettin(),
     };
     println!("Spawning {} @ {},{}", name, pos.x, pos.y);
     ecs.push(
@@ -45,14 +53,11 @@ pub fn spawn_monster(
             Enemy,
             pos,
             Render{
-                color: ColorPair::new(
-                    RGB::named(WHITE),
-                    RGB::named(BLACK)
-                ),
+                color: ColorPair::new(WHITE, BLACK),
                 glyph
             },
             ChasingPlayer{},
-            Health{ current: hp, max: hp},
+            Health{current: hp, max: hp},
             Name(name),
             FieldOfView::new(radius),
         )
@@ -103,6 +108,25 @@ pub fn spawn_entrance(ecs: &mut World, pos: Point) {
                 glyph: to_cp437('>')
             },
             Name("Entrance".to_string())
+        )
+    );
+}
+
+pub fn spawn_potion(
+    ecs: &mut World,
+    pos: Point,
+) {
+    println!("Spawning potion @ {},{}", pos.x, pos.y);
+    ecs.push(
+        (
+            Item,
+            Potion,
+            pos,
+            Render {
+                color: ColorPair::new(WHITE, BLACK),
+                glyph: to_cp437('!')
+            },
+            Name("Potion".to_string())
         )
     );
 }

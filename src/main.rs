@@ -23,7 +23,10 @@ pub mod prelude {
     pub use crate::systems::*;
     pub use crate::turn_state::*;
     pub use crate::Level;
+    pub use crate::Kills;
 }
+
+const LEVEL: usize = 1;
 
 use prelude::*;
 
@@ -39,6 +42,8 @@ impl Level {
     }
 }
 
+pub type Kills = usize;
+
 struct State {
     ecs: World,
     resources: Resources,
@@ -51,12 +56,16 @@ impl State {
         let mut ecs = World::default();
         let mut resources = Resources::default();
         let mut rng = RandomNumberGenerator::new();
-        let level = Level::new(0);
+        let level = Level::new(LEVEL);
+        let kills: Kills = 0;
         let map_builder = MapBuilder::build(&mut rng, level);
         spawn_player(&mut ecs, map_builder.player_start, 1, 10);
         map_builder.monster_spawns
             .iter()
             .for_each(|pos| spawn_monster(&mut ecs, &mut rng, *pos, level));
+        map_builder.potion_spawns
+            .iter()
+            .for_each(|pos| spawn_potion(&mut ecs, *pos));
         if level.level == 3 {
             spawn_amulet_of_yala(&mut ecs, map_builder.amulet_start);
         }
@@ -70,6 +79,7 @@ impl State {
         resources.insert(Camera::new(map_builder.player_start));
         resources.insert(TurnState::AwaitingInput);
         resources.insert(level);
+        resources.insert(kills);
         Self {
             ecs,
             resources,
@@ -89,7 +99,7 @@ impl State {
         ctx.print_color_centered(9, GREEN, BLACK, "Press 1 to play again.");
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
-            self.reset_game_state(Level::new(0), 1, 10);
+            self.reset_game_state(Level::new(LEVEL), 1, 10, 0);
         }
     }
     fn victory(&mut self, ctx: &mut BTerm) {
@@ -104,10 +114,10 @@ impl State {
         play again.");
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
-            self.reset_game_state(Level::new(0), 1, 10);
+            self.reset_game_state(Level::new(LEVEL), 1, 10, 0);
         }
     }
-    fn descend(&mut self, level: Level) {
+    fn descend(&mut self, level: Level, kills: Kills) {
         let mut player = <(&Health, &Player)>::query().filter(component::<Player>());
         let mut damage = 1;
         let mut current = 10;
@@ -115,9 +125,9 @@ impl State {
             damage = p1.damage;
             current = hp.current;
         });
-        self.reset_game_state(level, damage, current);
+        self.reset_game_state(level, damage, current, kills);
     }
-    fn reset_game_state(&mut self, level: Level, damage: i32, current: i32) {
+    fn reset_game_state(&mut self, level: Level, damage: i32, current: i32, kills: Kills) {
         self.ecs = World::default();
         self.resources = Resources::default();
         let mut rng = RandomNumberGenerator::new();
@@ -126,6 +136,9 @@ impl State {
         map_builder.monster_spawns
             .iter()
             .for_each(|pos| spawn_monster(&mut self.ecs, &mut rng, *pos, level));
+        map_builder.potion_spawns
+            .iter()
+            .for_each(|pos| spawn_potion(&mut self.ecs, *pos));
         if level == Level::new(3) {
             spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
         }
@@ -139,6 +152,7 @@ impl State {
         self.resources.insert(Camera::new(map_builder.player_start));
         self.resources.insert(TurnState::AwaitingInput);
         self.resources.insert(level);
+        self.resources.insert(kills);
     }
 }
 impl GameState for State {
@@ -154,6 +168,7 @@ impl GameState for State {
         self.resources.insert(Point::from_tuple(ctx.mouse_pos()));
         let current_state = self.resources.get::<TurnState>().unwrap().clone();
         let level = self.resources.get::<Level>().unwrap().clone();
+        let kills = self.resources.get::<Kills>().unwrap().clone();
         match current_state {
             TurnState::AwaitingInput => self.input_systems.execute(
                 &mut self.ecs, &mut self.resources
@@ -166,7 +181,7 @@ impl GameState for State {
             ),
             TurnState::GameOver => self.game_over(ctx),
             TurnState::Victory => self.victory(ctx),
-            TurnState::Descend => self.descend(Level::new(level.level+1))
+            TurnState::Descend => self.descend(Level::new(level.level+1), kills)
         }
         render_draw_buffer(ctx).expect("Render error");
     }
@@ -177,10 +192,10 @@ fn main() -> BError {
         .with_dimensions(DISPLAY_WIDTH, DISPLAY_HEIGHT)
         .with_tile_dimensions(32, 32)
         .with_resource_path("resources/")
-        .with_font("dungeonfont.png", 32, 32)
+        .with_font("dungeonfont2.png", 32, 32)
         .with_font("terminal8x8.png", 8, 8)
-        .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
-        .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont.png")
+        .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont2.png")
+        .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, "dungeonfont2.png")
         .with_simple_console_no_bg(SCREEN_WIDTH*2, SCREEN_HEIGHT*2, "terminal8x8.png")
         .build()?;
 

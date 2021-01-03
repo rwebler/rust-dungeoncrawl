@@ -40,6 +40,7 @@ impl MapArchitect for DrunkardsWalkArchitect {
             map: Map::new(),
             rooms: Vec::new(),
             monster_spawns: Vec::new(),
+            potion_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
             pike_start: Point::zero(),
@@ -71,6 +72,7 @@ impl MapArchitect for DrunkardsWalkArchitect {
                     .for_each(|(idx, _)| mb.map.tiles[idx] = TileType::Wall);
             }
         mb.monster_spawns = mb.spawn_monsters(&center, rng, level);
+        mb.potion_spawns = mb.spawn_potions(&center, rng, level);
         mb.player_start = center;
         mb.amulet_start = mb.find_most_distant(center);
         mb.pike_start = mb.find_most_distant(mb.amulet_start);

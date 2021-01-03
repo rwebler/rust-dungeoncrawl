@@ -8,6 +8,7 @@ impl MapArchitect for ArenaArchitect {
             map: Map::new(),
             rooms: Vec::new(),
             monster_spawns: Vec::new(),
+            potion_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
             pike_start: Point::zero(),

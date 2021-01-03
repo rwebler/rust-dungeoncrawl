@@ -4,7 +4,7 @@ use crate::prelude::*;
 #[read_component(WantsToAttack)]
 #[read_component(Player)]
 #[write_component(Health)]
-pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
+pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer, #[resource] kills: &mut Kills) {
     let mut attackers = <(Entity, &WantsToAttack)>::query();
     let victims: Vec<(Entity, Entity, Entity)> = attackers
         .iter(ecs)
@@ -33,6 +33,7 @@ pub fn combat(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
             health.current -= damage;
             if health.current < 1 && !is_player {
                 commands.remove(*victim);
+                *kills += 1;
             }
         }
         commands.remove(*message);

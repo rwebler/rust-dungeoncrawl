@@ -19,6 +19,7 @@ pub struct MapBuilder {
     pub map: Map,
     pub rooms: Vec<Rect>,
     pub monster_spawns: Vec<Point>,
+    pub potion_spawns: Vec<Point>,
     pub player_start: Point,
     pub amulet_start: Point,
     pub pike_start: Point,
@@ -126,6 +127,36 @@ impl MapBuilder {
             .collect();
         let mut spawns = Vec::new();
         for _ in 0..15 * (level.level+1) {
+            let target_index = rng.random_slice_index(&spawnable_tiles)
+                .unwrap();
+            spawns.push(spawnable_tiles[target_index].clone());
+            spawnable_tiles.remove(target_index);
+        }
+        spawns
+    }
+    fn spawn_potions(
+        &self,
+        start: &Point,
+        rng: &mut RandomNumberGenerator,
+        level: Level
+    ) -> Vec<Point> {
+        let mut spawns = Vec::new();
+        if level.level == 0 {
+            return spawns;
+        }
+        let mut spawnable_tiles: Vec<Point> = self.map.tiles
+            .iter()
+            .enumerate()
+            .filter(|(idx, t)|
+                (**t == TileType::Floor || **t == TileType::Ground) &&
+                DistanceAlg::Pythagoras.distance2d(
+                    *start,
+                    self.map.index_to_point2d(*idx)
+                ) > 15.0
+            )
+            .map(|(idx, _)| self.map.index_to_point2d(idx))
+            .collect();
+        for _ in 0..2 * level.level {
             let target_index = rng.random_slice_index(&spawnable_tiles)
                 .unwrap();
             spawns.push(spawnable_tiles[target_index].clone());

@@ -5,7 +5,7 @@ use crate::prelude::*;
 #[read_component(Point)]
 #[read_component(Player)]
 #[read_component(PikeOfDestiny)]
-pub fn hud(ecs: &SubWorld, #[resource] level: &Level) {
+pub fn hud(ecs: &SubWorld, #[resource] level: &Level, #[resource] kills: &Kills) {
     let mut player_query = <(&Point, &Health)>::query().filter(component::<Player>());
     let (player_pos, player_health) = player_query
         .iter(ecs)
@@ -42,7 +42,7 @@ pub fn hud(ecs: &SubWorld, #[resource] level: &Level) {
     );
     draw_batch.print_color_centered(
         2,
-        format!("Level: {} / {} ({},{})", level.level, 3, player_pos.x, player_pos.y),
+        format!("Level: {} / {} ({},{}) Kills: {}", level.level, 3, player_pos.x, player_pos.y, kills),
         ColorPair::new(WHITE, BLACK)
     );
     draw_batch.submit(10000).expect("Batch error");

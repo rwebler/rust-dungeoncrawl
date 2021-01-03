@@ -7,6 +7,7 @@ impl MapArchitect for RoomsArchitect {
             map: Map::new(),
             rooms: Vec::new(),
             monster_spawns: Vec::new(),
+            potion_spawns: Vec::new(),
             player_start: Point::zero(),
             amulet_start: Point::zero(),
             pike_start: Point::zero(),
@@ -20,6 +21,9 @@ impl MapArchitect for RoomsArchitect {
         for room in mb.rooms.iter().skip(1) {
             if rng.range(-1, 3) <= level.level as i32 {
                 mb.monster_spawns.push(room.center());
+            }
+            if rng.range(0, 9) < level.level as i32 {
+                mb.potion_spawns.push(room.center()+1);
             }
         }
         mb
