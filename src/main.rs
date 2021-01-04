@@ -30,17 +30,7 @@ const LEVEL: usize = 0;
 
 use prelude::*;
 
-#[derive(Clone, Copy, Debug, PartialEq, PartialOrd)]
-pub struct Level {
-    level: usize,
-}
-impl Level {
-    fn new(level: usize) -> Self {
-        Self {
-            level
-        }
-    }
-}
+pub type Level = usize;
 
 pub type Kills = usize;
 
@@ -56,7 +46,7 @@ impl State {
         let mut ecs = World::default();
         let mut resources = Resources::default();
         let mut rng = RandomNumberGenerator::new();
-        let level = Level::new(LEVEL);
+        let level = LEVEL;
         let kills: Kills = 0;
         let map_builder = MapBuilder::build(&mut rng, level);
         spawn_player(&mut ecs, map_builder.player_start, 1, 10);
@@ -66,13 +56,13 @@ impl State {
         map_builder.potion_spawns
             .iter()
             .for_each(|pos| spawn_potion(&mut ecs, *pos));
-        if level.level == 3 {
+        if level == 3 {
             spawn_amulet_of_yala(&mut ecs, map_builder.amulet_start);
         }
-        if level.level == 2 {
+        if level == 2 {
             spawn_pike_of_destiny(&mut ecs, map_builder.pike_start);
         }
-        if level.level < 2 {
+        if level < 2 {
             spawn_entrance(&mut ecs, map_builder.amulet_start);
         }
         resources.insert(map_builder.map);
@@ -99,7 +89,7 @@ impl State {
         ctx.print_color_centered(9, GREEN, BLACK, "Press 1 to play again.");
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
-            self.reset_game_state(Level::new(LEVEL), 1, 10, 0);
+            self.reset_game_state(LEVEL, 1, 10, 0);
         }
     }
     fn victory(&mut self, ctx: &mut BTerm) {
@@ -114,7 +104,7 @@ impl State {
         play again.");
 
         if let Some(VirtualKeyCode::Key1) = ctx.key {
-            self.reset_game_state(Level::new(LEVEL), 1, 10, 0);
+            self.reset_game_state(LEVEL, 1, 10, 0);
         }
     }
     fn descend(&mut self, level: Level, kills: Kills) {
@@ -139,13 +129,13 @@ impl State {
         map_builder.potion_spawns
             .iter()
             .for_each(|pos| spawn_potion(&mut self.ecs, *pos));
-        if level == Level::new(3) {
+        if level == 3 {
             spawn_amulet_of_yala(&mut self.ecs, map_builder.amulet_start);
         }
-        if level == Level::new(1) {
+        if level == 3 {
             spawn_pike_of_destiny(&mut self.ecs, map_builder.pike_start);
         }
-        if level < Level::new(3) {
+        if level < 3 {
             spawn_entrance(&mut self.ecs, map_builder.amulet_start);
         }
         self.resources.insert(map_builder.map);
@@ -181,7 +171,7 @@ impl GameState for State {
             ),
             TurnState::GameOver => self.game_over(ctx),
             TurnState::Victory => self.victory(ctx),
-            TurnState::Descend => self.descend(Level::new(level.level+1), kills)
+            TurnState::Descend => self.descend(level+1, kills)
         }
         render_draw_buffer(ctx).expect("Render error");
     }

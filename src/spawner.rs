@@ -27,10 +27,10 @@ fn goblin() -> (i32, String, FontCharType, i32) {
     (1, "Goblin".to_string(), to_cp437('g'), 7)
 }
 fn orc() -> (i32, String, FontCharType, i32) {
-    (2, "Orc Spectre".to_string(), to_cp437('o'), 5)
+    (2, "Orc".to_string(), to_cp437('o'), 5)
 }
 fn orc_brute() -> (i32, String, FontCharType, i32) {
-    (3, "Orc".to_string(), to_cp437('O'), 4)
+    (3, "Brute".to_string(), to_cp437('O'), 4)
 }
 fn ettin() -> (i32, String, FontCharType, i32) {
     (4, "Ettin".to_string(), to_cp437('E'), 3)
@@ -41,7 +41,7 @@ pub fn spawn_monster(
     pos: Point,
     level: Level
 ) {
-    let (hp, name, glyph, radius) = match rng.roll_dice(1, 12) + (level.level as i32) {
+    let (hp, name, glyph, radius) = match rng.roll_dice(1, 12) + (level as i32) {
         1..=7 => goblin(),
         8..=11 => orc(),
         12..=13 => orc_brute(),

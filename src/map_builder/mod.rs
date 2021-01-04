@@ -126,7 +126,7 @@ impl MapBuilder {
             .map(|(idx, _)| self.map.index_to_point2d(idx))
             .collect();
         let mut spawns = Vec::new();
-        for _ in 0..15 * (level.level+1) {
+        for _ in 0..15 * (level+1) {
             let target_index = rng.random_slice_index(&spawnable_tiles)
                 .unwrap();
             spawns.push(spawnable_tiles[target_index].clone());
@@ -141,7 +141,7 @@ impl MapBuilder {
         level: Level
     ) -> Vec<Point> {
         let mut spawns = Vec::new();
-        if level.level == 0 {
+        if level == 0 {
             return spawns;
         }
         let mut spawnable_tiles: Vec<Point> = self.map.tiles
@@ -156,7 +156,7 @@ impl MapBuilder {
             )
             .map(|(idx, _)| self.map.index_to_point2d(idx))
             .collect();
-        for _ in 0..2 * level.level {
+        for _ in 0..2 * level {
             let target_index = rng.random_slice_index(&spawnable_tiles)
                 .unwrap();
             spawns.push(spawnable_tiles[target_index].clone());
@@ -166,8 +166,8 @@ impl MapBuilder {
     }
     pub fn build(rng: &mut RandomNumberGenerator, level: Level) -> Self {
         let mut architect : Box<dyn MapArchitect> = Box::new(RoomsArchitect{});
-        if level.level< 3 {
-            architect = match level.level {
+        if level < 3 {
+            architect = match level {
                 0 => Box::new(CellularAutomataArchitect{}),
                 1 => Box::new(RoomsArchitect{}),
                 _ => Box::new(DrunkardsWalkArchitect{})
